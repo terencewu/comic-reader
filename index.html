@@ -8,7 +8,12 @@
     <div id="main-image-container" class="fit-width">
       <img id="main-image" class="flex-img" onclick="next()" src="" />
     </div>
-
+    <div id="info">
+      <div id="file_name"></div>
+      <div>
+        <input id="page_number" type="text"/>&#47;<span id="page_count"></span>
+      </div>
+    </div>
     <div id="nav">
       <div id="upload-container" class="ctrl">
         <label for="upload">
@@ -29,9 +34,7 @@
       <div onclick="next()" class="ctrl"> Next Page </div>
     </div>
 
-
-
+    <script type="text/javascript" src="js/uncompress.js"></script>
     <script type="text/javascript" src="main.js"></script>
-    <script type="text/javascript" src="jszip.js"></script>
   </body>
 </html>

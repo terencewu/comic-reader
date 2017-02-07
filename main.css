@@ -21,8 +21,18 @@ html, body {
   -webkit-justify-content: center; /* Safari */
   justify-content: center;
   text-align: center;
-  height: 90vh;
+  height: 85vh;
   overflow: hidden;
+}
+
+#info {
+  height: 5vh;
+  display:flex;
+  /* Safari */
+  -webkit-justify-content: space-around;
+  justify-content: space-around;
+  flex-direction: row;
+  text-align: center;
 }
 
 #nav {
@@ -32,19 +42,30 @@ html, body {
   -webkit-justify-content: space-between; 
   justify-content: space-between;
   flex-direction: row;
+  text-align: center;
 }
 
 #main-image {
   padding: 5px 0px;
   transition: all 0.5s cubic-bezier(0.75, 0.25, 0.25, 0.75);
+  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  cursor: pointer;
+  cursor: hand;
 }
 
 .ctrl {
   flex: 1;
+  cursor: pointer;
+  cursor: hand;
 }
 
 .ctrl img {
   max-width: 100px;
+}
+
+#page_number {
+  width: 50px;
 }
 
 #upload {
