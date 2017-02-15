@@ -2,11 +2,10 @@
 
 var img = document.getElementById("main-image");
 var imgcontainer = document.getElementById("main-image-container");
+var archive_name = document.getElementById("archive_name");
 var file_name = document.getElementById("file_name");
 var page_count = document.getElementById("page_count");
 var page_number = document.getElementById("page_number");
-// page_number.oninput = choosePage; 
-// page_number.onpropertychange = page_number.oninput;
 page_number.onkeypress = choosePage;
 
 var imageWidth = 0;
@@ -20,7 +19,7 @@ var scrollnext = 0;
 var autoscrolling = false;
 var archive = null;
 var mode = 0;
-
+var left2right = true;
 
 
 function choosePage(evt) {
@@ -31,9 +30,6 @@ function choosePage(evt) {
   if (!evt) evt = window.event;
   var keyCode = evt.keyCode || evt.which;
   if (keyCode == '13'){ // Enter pressed
-    console.log("pressed enter");
-    console.log(page_number);
-    console.log(page_number.value);
     //check if page_number.value is an integer
     if(parseInt(page_number.value) === NaN) {
       return false;
@@ -46,20 +42,45 @@ function choosePage(evt) {
 
 }
 
-function scrollTo(element, destination, duration = 500, callback) {
+function toggleDirection() {
+  //default direction is left to right
+  left2right = !left2right;
+}
+
+function scrollTo(element, destination, scrolldirection = "down", duration = 500, callback) {
+  if(scrolldirection === "down") {
+    scrolldirection = "scrollTop";
+  }
+  else if(scrolldirection === "left") {
+    console.log("left2right");
+    scrolldirection = "scrollLeft";
+    //scrolldirection = "scrollRight";
+  }
+  else if(scrolldirection === "right") {
+    console.log("right2left");
+    // scrolldirection = "scrollLeft";
+    scrolldirection = "scrollRight";
+  }
 
   function easeInOut(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
   };
 
-  var start = element.scrollTop;
+  var start = element[scrolldirection];
   var startTime = Date.now();
+
+  if(destination < start) {
+    console.log("destination going reverse");
+    console.log(start);
+    console.log(destination);
+  }
 
   function scroll() {
     var now = Date.now();
     var time = Math.min(1, ((now - startTime) / duration));
     var timeFunction = easeInOut(time);
-    element.scrollTop = (timeFunction * (destination - start)) + start;
+    // element.scrollTop = (timeFunction * (destination - start)) + start;
+    element[scrolldirection] = (timeFunction * (destination - start)) + start;
     if((now - startTime) >= duration) {
       callback();
       return ;
@@ -105,15 +126,32 @@ function fitheight() {
   addClass(imgcontainer, 'fit-height');
 }
 
-function step() {
+function fitwidthstep() {
   clearClasses();
+  resetOriginal();
+  addClass(imgcontainer, 'fit-width-step');
+}
+
+function fitheightstep() {
+  clearClasses();
+  resetOriginal();
+  addClass(imgcontainer, 'fit-height-step');
+}
+
+function step() {
+  if(autoscrolling) {
+    //prevents user from pressing too quickly for step() to resolve
+    return ;
+  }
+
+  clearClasses();
+
   //set width based on natural image width
   switch (mode) {
   case 0: //scrolling down
     addClass(imgcontainer, 'fit-width-step');
 
-    scrollnext = scrollcurrent + (screenheight/2);
-
+    scrollnext = imgcontainer.scrollTop + (screenheight/2);
     /*
       1. No scrolling needed
       2. nextpage triggered.
@@ -122,7 +160,6 @@ function step() {
         (nextpage && (imgcontainer.scrollHeight - imgcontainer.clientHeight) <= scrollnext )
       ) {
       console.log("going to next page");
-      scrollcurrent = 0;
       scrollnext = 0;
       nextpage = false;
       next();
@@ -135,17 +172,56 @@ function step() {
 
       console.log("scroll down");
       autoscrolling = true;
-      scrollTo(imgcontainer,  scrollnext, 500, function() {
-        scrollcurrent = scrollnext;
+      scrollTo(imgcontainer,  scrollnext, "down", 500, function() {
         autoscrolling = false;
      });
     }
-
     break;
+
   case 1: //scrolling left/right
     addClass(imgcontainer, 'fit-height-step');
-    // imgcontainer.scrollLeft = step_index * (screenwidth/2);
+
+    scrollnext = imgcontainer.scrollLeft + (screenwidth/2);
+    /*
+      1. No scrolling needed
+      2. nextpage triggered.
+     */
+    console.log(((imgcontainer.scrollWidth - imgcontainer.clientWidth) <= 0) ||
+        (nextpage && (imgcontainer.scrollWidth - imgcontainer.clientWidth) <= scrollnext ));
+
+    if( ((imgcontainer.scrollWidth - imgcontainer.clientWidth) <= 0) ||
+        (nextpage && (imgcontainer.scrollWidth - imgcontainer.clientWidth) <= scrollnext )
+      ) {
+      console.log("going to next page");
+      scrollnext = 0;
+      nextpage = false;
+      next();
+    }
+    else {
+      if((imgcontainer.scrollWidth - imgcontainer.clientWidth) <= scrollnext) {
+        console.log("next page");
+        nextpage = true;
+      }
+
+      console.log("scroll left/right");
+      autoscrolling = true;
+
+      /*
+        reading direction
+        "left" = left 2 right
+        "right" = right 2 left
+      */                
+      var direction = "left";
+      if(!left2right) {
+        direction = "right";
+      }
+
+      scrollTo(imgcontainer, scrollnext, direction, 500, function() {
+        autoscrolling = false;
+     });
+    }
     break;
+
   default:
     break;
   }
@@ -160,7 +236,8 @@ function next() {
   archive.next();
 }
 
-function loadinfo(fname, pgnum, pgcount) {
+function loadinfo(archivename, fname, pgnum, pgcount) {
+  archive_name.innerHTML = archivename;
   file_name.innerHTML = fname;
   page_number.value = pgnum + 1; //displays + 1 because 0 is first index.
   page_count.innerHTML = pgcount;
@@ -175,7 +252,9 @@ function handleFileSelect(evt) {
 }
 
 imgcontainer.onscroll = function(evt) {
-  console.log("st : " + imgcontainer.scrollTop);
+  // console.log("scrollTop : " + imgcontainer.scrollTop);
+  // console.log("scrollLeft : " + imgcontainer.scrollLeft);
+  // console.log("scrollRight : " + imgcontainer.scrollRight);
   //Only detects user scrolling and not scrolling performed during function call
   if(!autoscrolling) {
     scrollcurrent = imgcontainer.scrollTop;
@@ -204,6 +283,7 @@ var stateCheck = setInterval(function() {
 function Unarchiver(archive) {
   var self = this;
   self.archive = archive;
+  self.archivename = archive.name;
   self.index = 0;
   self.archivecontent = [];
   self.gotopage = function(index) { 
@@ -263,13 +343,30 @@ function _archive(archive) {
       img.onload = function() {
         imageWidth = img.clientWidth;
         imageHeight = img.clientHeight;
+        
+
+        if(img.naturalWidth > img.naturalHeight) {
+          fitheightstep();
+          mode = 1;
+        }
+        else {  //squares or height > width
+          fitwidthstep();
+          mode = 0;
+        }
+
         URL.revokeObjectURL(imgurl); //free object
       }
 
-      loadinfo(entry.name, index, pages)
+      loadinfo(archive.name, entry.name, index, pages)
       img.src = imgurl;
 
       imgcontainer.scrollTop = 0;
+      if(left2right) {
+        imgcontainer.scrollLeft = 0;
+      }
+      else {
+        imgcontainer.scrollRight = 0;
+      }
     });    
   }
 

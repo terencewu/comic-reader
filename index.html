@@ -9,29 +9,35 @@
       <img id="main-image" class="flex-img" onclick="next()" src="" />
     </div>
     <div id="info">
-      <div id="file_name"></div>
+      <div id="archive_name">Archive Name</div>
+      <div id="file_name"> File Name</div>
       <div>
-        <input id="page_number" type="text"/>&#47;<span id="page_count"></span>
+        <input id="page_number" type="text" value="Page Number"/>&#47;<span id="page_count">Page Count</span>
       </div>
     </div>
     <div id="nav">
       <div id="upload-container" class="ctrl">
         <label for="upload">
-          <img src="http://goo.gl/pB9rpQ"/>
+          <img src=""/>
+          Upload<br>Choose Folder
         </label>
         <input id="upload" type="file"/>
       </div>
-      <div onclick="fitheight()" class="ctrl"> Fit Height 
-        <!-- <img src="img/fitwidth.svg" /> -->
+      <div onclick="fitheight()" class="ctrl"> 
+        Fit <br> Height 
       </div>
-      <div onclick="fitwidth()" class="ctrl"> Fit Width 
-        <!-- <img src="img/fitwidth.svg" /> -->
+      <div onclick="fitwidth()" class="ctrl"> 
+        Fit <br> Width 
+      </div>
+      <div onclick="toggleDirection()" class="ctrl"> 
+        Direction <br>
+        <span id="direction">Left to Right</span>
       </div>
       <div onclick="step()" class="ctrl"> Original 
         <!-- <img src="img/fitheight.svg" /> -->
       </div>
-      <div onclick="prev()" class="ctrl"> Prev Page </div>
-      <div onclick="next()" class="ctrl"> Next Page </div>
+      <div onclick="prev()" class="ctrl"> Prev<br>Page </div>
+      <div onclick="next()" class="ctrl"> Next<br>Page </div>
     </div>
 
     <script type="text/javascript" src="js/uncompress.js"></script>

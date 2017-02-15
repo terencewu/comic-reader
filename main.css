@@ -33,6 +33,19 @@ html, body {
   justify-content: space-around;
   flex-direction: row;
   text-align: center;
+
+  border: 1px solid grey;
+}
+
+#info > div {
+  flex: 1;
+  /* background-color: lightblue; */
+  /* border-radius: 100px; */
+
+  /*Center text*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #nav {
@@ -58,6 +71,12 @@ html, body {
   flex: 1;
   cursor: pointer;
   cursor: hand;
+
+  background-color: lightblue;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ctrl img {
@@ -70,6 +89,11 @@ html, body {
 
 #upload {
   display: none;
+}
+
+#upload-container > * {
+  cursor: pointer;
+  cursor: hand;
 }
 
 /*Also known as responsive image (by width)*/
@@ -87,22 +111,25 @@ html, body {
   overflow-x: auto;
 }
 
-.fit-width img {
-  /* width: 100%; */
-  width: 100vw;
-}
+/* .fit-width img { */
+/*   /\* width: 100%; *\/ */
+/*   width: 100vw; */
+/* } */
 
-.fit-height img {
-  height: 100%; /*disables the overflow-y*/
-  max-width: none;
-}
+/* .fit-height img { */
+/*   height: 100%; /\*disables the overflow-y*\/ */
+/*   max-width: none; */
+/* } */
 
+.fit-width img, 
 .fit-width-step img {
   width: 100vw;
   transition: all 0.5s cubic-bezier(0.75, 0.25, 0.25, 0.75);
 }
 
+.fit-height img,
 .fit-height-step img {
-  height: 100vh;
+  height: 100%;
+  max-width: none;
   transition: all 0.5s cubic-bezier(0.75, 0.25, 0.25, 0.75);
 }
