@@ -2,6 +2,7 @@
 
 var img = document.getElementById("main-image");
 var imgcontainer = document.getElementById("main-image-container");
+var step_elem = document.getElementById("step");
 var archive_name = document.getElementById("archive_name");
 var file_name = document.getElementById("file_name");
 var page_count = document.getElementById("page_count");
@@ -162,11 +163,15 @@ function step() {
       console.log("going to next page");
       scrollnext = 0;
       nextpage = false;
+      step_elem.innerHTML = "Scroll<br>Down";
       next();
     }
     else {
       if((imgcontainer.scrollHeight - imgcontainer.clientHeight) <= scrollnext) {
         console.log("next page");
+
+        //update button text
+        step_elem.innerHTML = "Next<br>Page";
         nextpage = true;
       }
 
@@ -180,6 +185,9 @@ function step() {
 
   case 1: //scrolling left/right
     addClass(imgcontainer, 'fit-height-step');
+
+    //set text
+    step_elem.innerHTML ="Scroll<br>Right";
 
     scrollnext = imgcontainer.scrollLeft + (screenwidth/2);
     /*
@@ -195,10 +203,14 @@ function step() {
       console.log("going to next page");
       scrollnext = 0;
       nextpage = false;
+      step_elem.innerHTML ="Scroll<br>Right";
       next();
     }
     else {
       if((imgcontainer.scrollWidth - imgcontainer.clientWidth) <= scrollnext) {
+        //update button text
+        step_elem.innerHTML = "Next<br>Page";
+
         console.log("next page");
         nextpage = true;
       }
@@ -310,8 +322,9 @@ function Unarchiver(archive) {
     return true;
   }
   self.next = function() {
-    if(0 <= self.index && self.index < self.archivecontent.length) {
+    if(0 <= self.index && self.index < self.archivecontent.length - 1) {
       self.index += 1;
+      console.log(self.index);
       self.gotopage(self.index);    
     }
   }
@@ -319,6 +332,7 @@ function Unarchiver(archive) {
   self.prev = function() {
     if(0 < self.index && self.index < self.archivecontent.length) {
       self.index -= 1;
+      console.log(self.index);
       self.gotopage(self.index);    
     }
   }
@@ -346,10 +360,17 @@ function _archive(archive) {
         
 
         if(img.naturalWidth > img.naturalHeight) {
+          if(left2right) {
+            step_elem.innerHTML ="Scroll<br>Right";
+          }
+          else {
+            step_elem.innerHTML ="Scroll<br>Left";
+          }
           fitheightstep();
           mode = 1;
         }
         else {  //squares or height > width
+          step_elem.innerHTML ="Scroll<br>Down";
           fitwidthstep();
           mode = 0;
         }
