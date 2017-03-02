@@ -7,19 +7,21 @@ var archive_name = document.getElementById("archive_name");
 var file_name = document.getElementById("file_name");
 var page_count = document.getElementById("page_count");
 var page_number = document.getElementById("page_number");
+var direction_elem = document.getElementById("direction");
 page_number.onkeypress = choosePage;
 
 var imageWidth = 0;
 var imageHeight = 0;
+var imageOriginalWidth = 0;
+var imageOriginalHeight = 0;
 var screenwidth = document.documentElement.clientWidth;
 var screenheight = document.documentElement.clientHeight;
 
 var nextpage = false;
-var scrollcurrent = 0;
 var scrollnext = 0;
 var autoscrolling = false;
 var archive = null;
-var mode = 0;
+var mode = "vertical";
 var left2right = true;
 
 var classlist = ["fit-height","fit-width","fit-width-step","fit-height-step"];
@@ -48,6 +50,8 @@ function choosePage(evt) {
 function toggleDirection() {
   //default direction is left to right
   left2right = !left2right;
+  var dirtext = left2right ? "Left to Right" : "Right to Left";
+  direction_elem.innerHTML = "Direction <br> " + dirtext;
 }
 
 function scrollTo(element, destination, scrolldirection = "down", duration = 500, callback) {
@@ -81,7 +85,6 @@ function scrollTo(element, destination, scrolldirection = "down", duration = 500
     var now = Date.now();
     var time = Math.min(1, ((now - startTime) / duration));
     var timeFunction = easeInOut(time);
-    // element.scrollTop = (timeFunction * (destination - start)) + start;
     element[scrolldirection] = (timeFunction * (destination - start)) + start;
     if((now - startTime) >= duration) {
       callback();
@@ -115,8 +118,7 @@ function clearClasses() {
 }
 
 function resetOriginal() {
-  mode = 0; //clears mode
-  scrollcurrent = 0;
+  mode = "vertical"; //clears mode
   scrollnext = 0;
   nextpage = false;
 }
@@ -148,6 +150,14 @@ function updatesteptext(newtext) {
   step_elem.innerHTML = newtext;
 }
 
+function resetscrollposition() {
+  imgcontainer.scrollTop = 0;
+  imgcontainer.scrollLeft = 0;
+  imgcontainer.scrollRight = 0;
+  // var scrolltype = left2right ? "scrollLeft" : "scrollRight";
+  // imgcontainer[scrolltype] = 0;
+}
+
 function step() {
   if(autoscrolling) {
     //prevents user from pressing too quickly for step() to resolve
@@ -165,42 +175,33 @@ function step() {
   var direction = '';
   var screenhalf = 0;
 
-  if(mode == 0) {
+  if(mode === "vertical") {
     stepclass = 'fit-width-step';
     //class must be set properly in order to values to be correct
     addClass(imgcontainer, stepclass);
     
-    steptext = 'Scroll<br>Down';
-    scrollposition = imgcontainer.scrollTop;
+    screenhalf = screenheight/2;
     scrolllength = imgcontainer.scrollHeight;
     clientlength = imgcontainer.clientHeight;
-    screenhalf = screenheight/2;
+    scrollposition = imgcontainer.scrollTop;
+    steptext = 'Scroll<br>Down';
     direction = "down";
   }
-  else if(mode == 1) {
+  else if(mode == "horizontal") {
     stepclass = 'fit-height-step';
     addClass(imgcontainer, stepclass);
 
+    screenhalf = screenwidth/2; 
     scrolllength = imgcontainer.scrollWidth;
     clientlength = imgcontainer.clientWidth;
-    screenhalf = screenwidth/2; 
+    scrollposition = left2right ? imgcontainer.scrollLeft : imgcontainer.scrollRight;
+    direction = left2right ? "left" : "right";
+    steptext = left2right ? "Scroll<br>Left" : "Scroll<br>Right";
     /*
       reading direction
       "left" = left 2 right
       "right" = right 2 left
     */     
-    // direction = left2right ? "left" : "right";
-
-    if(left2right) {
-      direction = "left";
-      steptext = 'Scroll<br>Left';
-      scrollposition = imgcontainer.scrollLeft;      
-    }
-    else {
-      direction = "right";
-      steptext = 'Scroll<br>Right';
-      scrollposition = imgcontainer.scrollRight;        
-    }
   }
 
   updatesteptext(steptext);
@@ -210,12 +211,6 @@ function step() {
     1. No scrolling needed
     2. nextpage triggered.
   */
-
-  console.log(screenhalf);
-  console.log(scrollposition);
-  console.log(scrolllength);
-  console.log(scrollnext);
-
   if(nextpage && ((scrolllength - clientlength) <= scrollnext)) {
     console.log("going to next page");
     scrollnext = 0;
@@ -230,7 +225,6 @@ function step() {
       nextpage = true;
     }
     autoscrolling = true;
-    console.log(direction);
     scrollTo(imgcontainer, scrollnext, direction, 500, function() {
       autoscrolling = false;
     });
@@ -267,7 +261,6 @@ imgcontainer.onscroll = function(evt) {
   // console.log("scrollRight : " + imgcontainer.scrollRight);
   //Only detects user scrolling and not scrolling performed during function call
   if(!autoscrolling) {
-    scrollcurrent = imgcontainer.scrollTop;
     nextpage = false;
   }
 }
@@ -286,7 +279,6 @@ var stateCheck = setInterval(function() {
 //read right to left
 
 //show two images at once
-
 
 function Unarchiver(archive) {
   var self = this;
@@ -311,11 +303,6 @@ function Unarchiver(archive) {
     //gets file extension
     var ext = filename.substr((~-filename.lastIndexOf(".") >>> 0) + 2);
     
-    // if(ext !== "jpg" && ext !== "jpeg" && ext !== "png" && ext !== "webp" && ext !== "bmp" && ext !== "gif") {
-    //   console.log("extension : " + ext + " is not supported.");
-    //   return false;
-    // }
-
     //checking this way is inefficient. (but is currently neglible) Will be better off saving this data in an array of objects after a single pass.
     for(var i = 0; i < imgext.length; i++) {
       if(ext === imgext[i]) {
@@ -329,7 +316,7 @@ function Unarchiver(archive) {
   self.next = function() {
     if(0 <= self.index && self.index < self.archivecontent.length - 1) {
       self.index += 1;
-      self.gotopage(self.index);    
+      self.gotopage(self.index);   
     }
   }
 
@@ -341,10 +328,35 @@ function Unarchiver(archive) {
   }
 }
 
-function _archive(archive) {
+function _archive(archive, mimetype) {
   Unarchiver.call(this, archive);
   var self = this;
+  self._loadimage = function(entry) {
+    entry.readData(function(data, err) {
+		  var blob = new Blob([data], {type: mimetype});
+		  var imgurl = URL.createObjectURL(blob);
+      img.onload = function() {
+        imageWidth = img.clientWidth;
+        imageHeight = img.clientHeight;
 
+        if(img.naturalWidth > img.naturalHeight) {
+          var steptext = left2right ? "Scroll<br>Left" : "Scroll<br>Right";
+          updatesteptext(steptext);
+          fitheightstep();
+          mode = "horizontal";
+        }
+        else {  //squares or height > width
+          updatesteptext("Scroll<br>Down");
+          fitwidthstep();
+          mode = "vertical";
+        }
+
+        URL.revokeObjectURL(imgurl); //free object
+      }
+
+      img.src = imgurl;
+    });
+  }
   self._gotopage = function(index) {
     var entry = self.archivecontent[index];
     var pages = self.archivecontent.length;
@@ -353,48 +365,9 @@ function _archive(archive) {
       return self.next();
     }
     var mimetype = "image/*";
-
-    entry.readData(function(data, err) {
-		  var blob = new Blob([data], {type: mimetype});
-		  var imgurl = URL.createObjectURL(blob);
-      img.onload = function() {
-        imageWidth = img.clientWidth;
-        imageHeight = img.clientHeight;
-        
-
-        if(img.naturalWidth > img.naturalHeight) {
-          if(left2right) {
-            // step_elem.innerHTML ="Scroll<br>Right";
-            updatesteptext("Scroll<br>Left");
-          }
-          else {
-            // step_elem.innerHTML ="Scroll<br>Left";
-            updatesteptext("Scroll<br>Right");
-          }
-          fitheightstep();
-          mode = 1;
-        }
-        else {  //squares or height > width
-          // step_elem.innerHTML ="Scroll<br>Down";
-          updatesteptext("Scroll<br>Down");
-          fitwidthstep();
-          mode = 0;
-        }
-
-        URL.revokeObjectURL(imgurl); //free object
-      }
-
-      loadinfo(archive.name, entry.name, index, pages)
-      img.src = imgurl;
-
-      imgcontainer.scrollTop = 0;
-      if(left2right) {
-        imgcontainer.scrollLeft = 0;
-      }
-      else {
-        imgcontainer.scrollRight = 0;
-      }
-    });    
+    self._loadimage(entry, mimetype);
+    resetscrollposition();
+    loadinfo(archive.name, entry.name, index, pages);
   }
 
   //load this! or we either put this as a constructor/prototype?

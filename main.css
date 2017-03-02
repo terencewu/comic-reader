@@ -121,15 +121,12 @@ html, body {
   overflow-x: auto;
 }
 
-/* .fit-width img { */
-/*   /\* width: 100%; *\/ */
-/*   width: 100vw; */
-/* } */
-
-/* .fit-height img { */
-/*   height: 100%; /\*disables the overflow-y*\/ */
-/*   max-width: none; */
-/* } */
+.fit-width,
+.fit-height {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .fit-width img, 
 .fit-width-step img {
