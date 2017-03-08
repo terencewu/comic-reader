@@ -29,33 +29,34 @@ var comicReader = (function() {
   var imgext = ["jpg", "jpeg", "png", "webp", "bmp", "gif"];
 
   function choosePage(evt) {
-    console.log("input change detected");
-    console.log(evt);
-    console.log(evt.target.value);
+    var keyCode;
+    var pageindex; 
 
+    console.log(evt);
     if (!evt) evt = window.event;
-    var keyCode = evt.keyCode || evt.which;
-    if (keyCode == '13'){ // Enter pressed
-      //check if page_number.value is an integer
+    keyCode = evt.keyCode || evt.which;
+    if (keyCode === 13){ /* Enter pressed */
+      /* not an integer */
       if(parseInt(page_number.value) === NaN) {
         return false;
       }
-      var pageindex = parseInt(page_number.value) - 1;
-      console.log("goto!");
-      //update global page index
+      pageindex = parseInt(page_number.value) - 1;
+      /* update global page index */
       archive.gotopage(pageindex);
     }  
 
   }
 
   function toggleDirection() {
-    //default direction is left to right
+    /* default direction is left to right */
     left2right = !left2right;
-    var dirtext = left2right ? "Left to Right" : "Right to Left";
-    direction_elem.innerHTML = "Direction <br> " + dirtext;
+    direction_elem.innerHTML = "Direction <br> " + (left2right ? "Left to Right" : "Right to Left");
   }
 
   function scrollTo(element, destination, scrolldirection = "down", duration = 500, callback) {
+    var start;
+    var startTime;
+    
     if(scrolldirection === "down") {
       console.log("top2bottom");
       scrolldirection = "scrollTop";
@@ -73,8 +74,8 @@ var comicReader = (function() {
       return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     };
 
-    var start = element[scrolldirection];
-    var startTime = Date.now();
+    start = element[scrolldirection];
+    startTime = Date.now();
 
     if(destination < start) {
       console.log("destination going reverse");
@@ -112,14 +113,10 @@ var comicReader = (function() {
     for(var i = 0; i < classlist.length; i++) {
       removeClass(imgcontainer, classlist[i])
     }
-    // removeClass(imgcontainer, 'fit-height');
-    // removeClass(imgcontainer, 'fit-width');
-    // removeClass(imgcontainer, 'fit-width-step');
-    // removeClass(imgcontainer, 'fit-height-step');
   }
 
   function resetOriginal() {
-    mode = "vertical"; //clears mode
+    mode = "vertical"; 
     scrollnext = 0;
     nextpage = false;
   }
@@ -155,30 +152,26 @@ var comicReader = (function() {
     imgcontainer.scrollTop = 0;
     imgcontainer.scrollLeft = 0;
     imgcontainer.scrollRight = 0;
-    // var scrolltype = left2right ? "scrollLeft" : "scrollRight";
-    // imgcontainer[scrolltype] = 0;
   }
 
   function step() {
+    /* prevents multiple step() calls */
     if(autoscrolling) {
-      //prevents user from pressing too quickly for step() to resolve
       return ;
     }
-
-    clearClasses();
-    
     var stepclass = '';
     var steptext = 'Scroll';
     var scrollposition = 0;
     var scrolllength = 0;
     var clientlength = 0;
-
     var direction = '';
     var screenhalf = 0;
 
+    clearClasses();
+
     if(mode === "vertical") {
       stepclass = 'fit-width-step';
-      //class must be set properly in order to values to be correct
+      /* class must be set properly to get correct dimensions */
       addClass(imgcontainer, stepclass);
       
       screenhalf = screenheight/2;
@@ -244,22 +237,24 @@ var comicReader = (function() {
   function loadinfo(archivename, fname, pgnum, pgcount) {
     archive_name.innerHTML = archivename;
     file_name.innerHTML = fname;
-    page_number.value = pgnum + 1; //displays + 1 because 0 is first index.
+    /* displays + 1 because 0 is first index. */
+    page_number.value = pgnum + 1; 
     page_count.innerHTML = pgcount;
   }
 
   function handleFileSelect(evt) {
-    var files = evt.target.files; // FileList object
+    /* FileList object */
+    var files = evt.target.files; 
 
-    //manually loads the type of archive formats for reading (required for uncompress.js)
+    /* 
+       manually loads the type of archive formats for reading 
+       (required for uncompress.js)
+    */
     loadArchiveFormats(['rar', 'zip', 'tar']);
     archive = new _archive(files[0]);
   }
 
   imgcontainer.onscroll = function(evt) {
-    // console.log("scrollTop : " + imgcontainer.scrollTop);
-    // console.log("scrollLeft : " + imgcontainer.scrollLeft);
-    // console.log("scrollRight : " + imgcontainer.scrollRight);
     //Only detects user scrolling and not scrolling performed during function call
     if(!autoscrolling) {
       nextpage = false;
@@ -276,10 +271,10 @@ var comicReader = (function() {
   }, 100);
 
 
-  //read left to right
-  //read right to left
-
-  //show two images at once
+  /*
+    read left to right
+    read right to left
+  */
 
   function Unarchiver(archive) {
     var self = this;
@@ -301,10 +296,9 @@ var comicReader = (function() {
       if(!filename) {
         return false;
       }
-      //gets file extension
+      /* gets file extension */
       var ext = filename.substr((~-filename.lastIndexOf(".") >>> 0) + 2);
       
-      //checking this way is inefficient. (but is currently neglible) Will be better off saving this data in an array of objects after a single pass.
       for(var i = 0; i < imgext.length; i++) {
         if(ext === imgext[i]) {
           return true;
@@ -345,13 +339,13 @@ var comicReader = (function() {
             fitheightstep();
             mode = "horizontal";
           }
-          else {  //squares or height > width
+          else {  /* squares or height > width */
             updatesteptext("Scroll<br>Down");
             fitwidthstep();
             mode = "vertical";
           }
 
-          URL.revokeObjectURL(imgurl); //free object
+          URL.revokeObjectURL(imgurl); 
         }
 
         img.src = imgurl;
@@ -370,7 +364,7 @@ var comicReader = (function() {
       loadinfo(archive.name, entry.name, index, pages);
     }
 
-    //load this! or we either put this as a constructor/prototype?
+    /* opening archive to get content */
 
     archiveOpenFile(archive, function(archivecontent, err) {
       if(err) {
