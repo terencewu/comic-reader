@@ -6,7 +6,7 @@
   <body class="flex-container">
 
     <div id="main-image-container" class="fit-width">
-      <img id="main-image" class="flex-img" onclick="next()" src="" />
+      <img id="main-image" class="flex-img" onclick="comicReader.next()" src="" />
     </div>
     <div id="info">
       <div id="archive_name">Archive Name</div>
@@ -23,21 +23,21 @@
         </label>
         <input id="upload" type="file"/>
       </div>
-      <div onclick="fitheight()" class="ctrl"> 
+      <div onclick="comicReader.fitheight()" class="ctrl"> 
         Fit <br> Height 
       </div>
-      <div onclick="fitwidth()" class="ctrl"> 
+      <div onclick="comicReader.fitwidth()" class="ctrl"> 
         Fit <br> Width 
       </div>
-      <div id="direction" onclick="toggleDirection()" class="ctrl"> 
+      <div id="direction" onclick="comicReader.toggleDirection()" class="ctrl"> 
         Direction <br>
         Left to Right
       </div>
-      <div id="step" onclick="step()" class="ctrl"> Step
+      <div id="step" onclick="comicReader.step()" class="ctrl"> Scroll
         <!-- <img src="img/fitheight.svg" /> -->
       </div>
-      <div onclick="prev()" class="ctrl"> Prev<br>Page </div>
-      <div onclick="next()" class="ctrl"> Next<br>Page </div>
+      <div onclick="comicReader.prev()" class="ctrl"> Prev<br>Page </div>
+      <div onclick="comicReader.next()" class="ctrl"> Next<br>Page </div>
     </div>
 
     <script type="text/javascript" src="lib/uncompress.js"></script>
