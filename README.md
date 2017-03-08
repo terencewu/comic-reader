@@ -1,5 +1,8 @@
 #Comic Reader
 Pure front-end client comic reader.
+
+Check it out [here](https://terencewu.github.io/comic-reader/).
+
 ## Dependencies and/or Acknowledgements
 - uncompress.js from [https://github.com/workhorsy/uncompress.js](https://github.com/workhorsy/uncompress.js)
 - libuntar.js from [https://github.com/wcchoi/libunrar-js](https://github.com/wcchoi/libunrar-js)
